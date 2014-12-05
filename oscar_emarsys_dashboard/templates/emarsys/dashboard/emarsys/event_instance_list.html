@@ -1,0 +1,30 @@
+{% extends 'dashboard/layout.html' %}
+{% load i18n %}
+{% load render_table querystring from django_tables2 %}
+
+{% block body_class%}{{ block.super }} emarsys-events{% endblock %}
+
+{% block title %}
+    {% trans "Emarsys event instances" %} | {{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+    <ul class="breadcrumb">
+        <li>
+            <a href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            <span class="divider">/</span>
+        </li>
+        <li class="active">{% trans "Emarsys event instances" %}</li>
+    </ul>
+{% endblock %}
+
+{% block header %}
+    <div class="page-header action">
+        <h1>{% trans "Emarsys event instances" %}</h1>
+    </div>
+{% endblock header %}
+
+{% block dashboard_content %}
+    {% render_table table %}
+{% endblock dashboard_content %}
+

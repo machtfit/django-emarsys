@@ -1,0 +1,16 @@
+{% extends 'dashboard/search_table.html' %}
+{% load querystring from django_tables2 %}
+{% block table.caption %}
+    <div class="pull-right">
+      <form action="{% url 'dashboard:emarsys-events-sync' %}{% querystring %}" method="post" class="form-inline">
+            {% csrf_token %}
+            {% if perms.django_emarsys.can_sync_events %}
+                <button class="btn btn-primary" type="submit" name="sync_events" data-loading-text="Synce...">
+                    <i class="icon-refresh"></i>
+                    Sync events
+                </button>
+            {% endif %}
+        </form>
+    </div>
+    {{ block.super }}
+{% endblock %}
