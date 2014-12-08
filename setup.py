@@ -8,4 +8,6 @@ setup(name='django_emarsys',
       author_email='mbertheau@gmail.com',
       long_description=open('README.md').read(),
       packages=['django_emarsys', 'oscar_emarsys_dashboard'],
-      install_requires=[])
+      install_requires=[
+          'python-emarsys<=0.2'
+      ])
