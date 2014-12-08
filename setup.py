@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='django_emarsys',
-      version='0.1.0',
+      version='0.2',
       description='Django and Oscar glue for Emarsys events',
       license="MIT",
       author='Markus Bertheau',
