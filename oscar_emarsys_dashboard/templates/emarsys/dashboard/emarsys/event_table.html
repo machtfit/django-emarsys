@@ -4,7 +4,7 @@
     <div class="pull-right">
       <form action="{% url 'dashboard:emarsys-events-sync' %}{% querystring %}" method="post" class="form-inline">
             {% csrf_token %}
-            {% if perms.django_emarsys.can_trigger_events %}
+            {% if perms.django_emarsys.can_trigger_event %}
                 <button class="btn btn-primary" type="submit" name="sync_events" data-loading-text="Synce...">
                     <i class="icon-refresh"></i>
                     Sync events
