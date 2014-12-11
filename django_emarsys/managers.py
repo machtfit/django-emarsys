@@ -37,6 +37,15 @@ class EventManager(models.Manager):
         for emarsys_event_name, emarsys_event_id in emarsys_events.items():
             self.create(emarsys_id=emarsys_event_id, name=emarsys_event_name)
 
-    def trigger(self, event_name, email, async=False, **kwargs):
+    def trigger(self, event_name, user, data=None, create_user_if_needed=True,
+                async=False):
         event = self.get(name=event_name, emarsys_id__isnull=False)
-        event.trigger(email, async, **kwargs)
+        event_instance = event.trigger(user, data, async=async)
+
+        if event_instance.state == 'error':
+            if event_instance.result_code == '2008':
+                if create_user_if_needed:
+                    api.create_contact(user.email)
+                    event_instance = event.trigger(user, data, async=async)
+
+        return event_instance

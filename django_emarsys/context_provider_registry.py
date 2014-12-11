@@ -12,6 +12,10 @@ from django.conf import settings
 context_providers = {}
 
 
+class ContextProviderException(Exception):
+    pass
+
+
 def register_context_provider(event_name):
     def _dec(func):
         if event_name in context_providers:
@@ -37,9 +41,10 @@ def get_context_provider(event_name):
         try:
             return context_providers[None]
         except KeyError:
-            raise Exception("No context provider registered for event {} and"
-                            " no general context provider registered either."
-                            .format(event_name))
+            raise ContextProviderException(
+                "No context provider registered for event '{}' and"
+                " no general context provider registered either."
+                .format(event_name))
 
 
 if settings.EMARSYS_USE_NULL_GENERIC_CONTEXT_PROVIDER:

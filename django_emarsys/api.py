@@ -24,3 +24,7 @@ def trigger_event(event_id, email, context):
             "data": context
         }
     )
+
+
+def create_contact(email):
+    client.call('/api/v2/contact', 'POST', {"3": email})

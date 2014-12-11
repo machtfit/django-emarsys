@@ -1,3 +1,9 @@
+{% if placeholder_data_error %}
+<div class="alert alert-error">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  {{ placeholder_data_error }}
+</div>
+{% endif %}
 <table>
 {% for placeholder, value in placeholder_data %}
   <tr>

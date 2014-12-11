@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import json
 
-from emarsys import Emarsys
+from emarsys import EmarsysError
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -28,9 +28,12 @@ class Event(models.Model):
     def __str__(self):
         return self.name
 
-    def trigger(self, user, data, source='automatic', async=False):
+    def trigger(self, user, data=None, source='automatic', async=False):
         if async:
             raise NotImplementedError
+
+        if data is None:
+            data = {}
 
         context = {'global': self.get_placeholder_data(
             **dict(data, user=user))}
@@ -59,8 +62,8 @@ class Event(models.Model):
 
         try:
             api.trigger_event(self.emarsys_id, user.email, context)
-        except Emarsys.Error as e:
-            event_instance.handle_error('Emarsys error: {}'.format(e))
+        except EmarsysError as e:
+            event_instance.handle_emarsys_error(e)
             return event_instance
 
         event_instance.handle_success()
@@ -121,11 +124,18 @@ class EventInstance(models.Model):
     when = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=1024, choices=SOURCE_CHOICES)
     result = models.CharField(max_length=1024, blank=True)
+    result_code = models.CharField(max_length=1024, blank=True)
     state = models.CharField(max_length=1024, choices=STATE_CHOICES,
                              default='sending')
 
     def handle_error(self, msg):
         self.result = msg
+        self.state = 'error'
+        self.save()
+
+    def handle_emarsys_error(self, emarsys_error):
+        self.result = 'Emarsys error: {}'.format(emarsys_error)
+        self.result_code = emarsys_error.code
         self.state = 'error'
         self.save()
 

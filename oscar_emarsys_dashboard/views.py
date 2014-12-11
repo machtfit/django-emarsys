@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 import json
 
+from emarsys import EmarsysError
+
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.forms import Form
@@ -18,8 +20,8 @@ from oscar.views.generic import ObjectLookupView
 
 from apps.views import SearchMixin, SearchFormMixin
 
-from emarsys import Emarsys
 from django_emarsys.models import Event, EventInstance
+from django_emarsys.context_provider_registry import ContextProviderException
 
 from .forms import EventTriggerForm
 from .tables import EventTable, EventInstanceTable
@@ -47,7 +49,7 @@ class EventsSyncView(FormView):
         try:
             Event.objects.sync_events()
             messages.success(self.request, 'Events gesynct.')
-        except Emarsys.Error as e:
+        except EmarsysError as e:
             messages.error(self.request, 'Emarsys error: {}'.format(e))
         return super(EventsSyncView, self).form_valid(form)
 
@@ -86,6 +88,10 @@ class EventTriggerView(EventTriggerMixin, SingleObjectMixin, FormView):
         return context
 
     def form_valid(self, form):
+        if not self.event.emarsys_id:
+            Event.objects.sync_events()
+            self.event = Event.objects.get(pk=self.event.pk)
+
         event_instance = self.event.trigger(
             user=form.cleaned_data.pop('user'),
             data=form.cleaned_data,
@@ -110,8 +116,12 @@ class EventPlaceholderDataView(EventTriggerMixin, SingleObjectMixin, FormView):
             **kwargs)
         form = kwargs.get('form')
         if form and form.is_bound:
-            data = self.event.get_placeholder_data(**form.cleaned_data)
-            context['placeholder_data'] = sorted(data.items())
+            try:
+                data = self.event.get_placeholder_data(**form.cleaned_data)
+            except ContextProviderException as e:
+                context['placeholder_data_error'] = e
+            else:
+                context['placeholder_data'] = sorted(data.items())
         return context
 
     def form_valid(self, form):
