@@ -12,7 +12,7 @@ client = emarsys.Emarsys(settings.EMARSYS_ACCOUNT,
 
 def get_events():
     response = client.call('/api/v2/event', 'GET')
-    return {event['name']: event['id'] for event in response}
+    return {event['name']: int(event['id']) for event in response}
 
 
 def trigger_event(event_id, email, context):
