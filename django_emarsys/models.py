@@ -63,6 +63,10 @@ class Event(models.Model):
                     'User not on whitelist: {}'.format(user.email))
                 return event_instance
 
+        if not self.emarsys_id:
+            event_instance.handle_error('Emarsys-ID unknown')
+            return event_instance
+
         try:
             api.trigger_event(self.emarsys_id, user.email, context)
         except EmarsysError as e:

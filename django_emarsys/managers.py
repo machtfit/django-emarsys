@@ -55,7 +55,7 @@ class EventManager(models.Manager):
 
     def trigger(self, event_name, user, data=None, create_user_if_needed=True,
                 async=False):
-        event = self.get(name=event_name, emarsys_id__isnull=False)
+        event = self.get(name=event_name)
         event_instance = event.trigger(user, data, async=async)
 
         if event_instance.state == 'error':
