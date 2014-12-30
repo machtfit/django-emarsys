@@ -43,6 +43,7 @@ class Event(models.Model):
             user=user,
             source=source)
 
+        name = None
         try:
             with transaction.atomic():
                 for name, value in data.items():
@@ -51,7 +52,9 @@ class Event(models.Model):
                         content_object=value)
         except (self.eventdata_set.model.DoesNotExist,
                 self.eventdata_set.model.MultipleObjectsReturned) as e:
-            event_instance.handle_error('Programming error: {}'.format(e))
+            event_instance.handle_error(
+                'Programming error for event data {}: {}'
+                .format(name, e))
             return event_instance
 
         if settings.EMARSYS_RECIPIENT_WHITELIST is not None:
