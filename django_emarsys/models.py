@@ -116,6 +116,7 @@ class EventData(models.Model):
                            ('event', 'name')]
 
 
+@python_2_unicode_compatible
 class EventInstance(models.Model):
     STATE_CHOICES = [('sending', 'sending'),
                      ('error', 'error'),
@@ -155,6 +156,9 @@ class EventInstance(models.Model):
             'sending': 'default',
             'error': 'important',
             'success': 'success'}[self.state], self.state)
+
+    def __str__(self):
+        return 'at {}: {}'.format(self.when, self.event.name)
 
 
 class EventInstanceData(models.Model):
