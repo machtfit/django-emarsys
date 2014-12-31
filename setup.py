@@ -9,7 +9,10 @@ setup(name='django_emarsys',
       author='Markus Bertheau',
       author_email='mbertheau@gmail.com',
       long_description=open('README.md').read(),
-      packages=['django_emarsys', 'oscar_emarsys_dashboard'],
+      packages=['django_emarsys',
+                'django_emarsys.management',
+                'django_emarsys.management.commands',
+                'oscar_emarsys_dashboard'],
       include_package_data=True,
       install_requires=[
           'python-emarsys==0.2'
