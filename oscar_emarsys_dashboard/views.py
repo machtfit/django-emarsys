@@ -92,8 +92,12 @@ class EventTriggerView(EventTriggerMixin, SingleObjectMixin, FormView):
             Event.objects.sync_events()
             self.event = Event.objects.get(pk=self.event.pk)
 
+        recipient_email = form.cleaned_data.pop('recipient_email')
+        user = form.cleaned_data.pop('user')
+
         event_instance = self.event.trigger(
-            user=form.cleaned_data.pop('user'),
+            recipient_email=recipient_email or user.email,
+            user=user,
             data=form.cleaned_data,
             source='manual')
 

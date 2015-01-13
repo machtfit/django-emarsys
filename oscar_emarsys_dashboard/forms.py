@@ -10,6 +10,7 @@ from oscar.forms.widgets import RemoteSelect
 
 
 class EventTriggerForm(forms.Form):
+    recipient_email = forms.CharField(required=False)
     user = forms.ModelChoiceField(queryset=None)
 
     def __init__(self, event, *args, **kwargs):

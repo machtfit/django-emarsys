@@ -47,4 +47,5 @@ class EventInstanceTable(DashboardTable):
 
     class Meta(DashboardTable.Meta):
         model = EventInstance
-        fields = ('when', 'event', 'source', 'result', 'state')
+        fields = ('when', 'recipient_email', 'event', 'source', 'result',
+                  'state')
