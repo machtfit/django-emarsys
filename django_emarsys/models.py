@@ -38,7 +38,10 @@ class Event(models.Model):
         context = {'global': self.get_placeholder_data(
             **dict(data, user=user))}
 
+        recipient_email = user.email
+
         event_instance = self.eventinstance_set.create(
+            recipient_email=recipient_email,
             context=json.dumps(context),
             user=user,
             source=source)
@@ -58,9 +61,9 @@ class Event(models.Model):
             return event_instance
 
         if settings.EMARSYS_RECIPIENT_WHITELIST is not None:
-            if user.email not in settings.EMARSYS_RECIPIENT_WHITELIST:
+            if recipient_email not in settings.EMARSYS_RECIPIENT_WHITELIST:
                 event_instance.handle_error(
-                    'User not on whitelist: {}'.format(user.email))
+                    'User not on whitelist: {}'.format(recipient_email))
                 return event_instance
 
         if not self.emarsys_id:
@@ -68,7 +71,7 @@ class Event(models.Model):
             return event_instance
 
         try:
-            api.trigger_event(self.emarsys_id, user.email, context)
+            api.trigger_event(self.emarsys_id, recipient_email, context)
         except EmarsysError as e:
             event_instance.handle_emarsys_error(e)
             return event_instance
@@ -126,6 +129,7 @@ class EventInstance(models.Model):
                       ('manual', 'manual')]
 
     event = models.ForeignKey(Event)
+    recipient_email = models.CharField(max_length=1024)
     user = models.ForeignKey(get_user_model())
     context = models.TextField()
     data = GenericRelation('EventInstanceData')
