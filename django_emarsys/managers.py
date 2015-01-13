@@ -53,15 +53,17 @@ class EventManager(models.Manager):
 
         return num_new_events, num_added_ids, num_updated_ids, num_deleted_ids
 
-    def trigger(self, event_name, user, data=None, create_user_if_needed=True,
-                async=False):
+    def trigger(self, event_name, recipient_email, user=None, data=None,
+                create_user_if_needed=True, async=False):
         event = self.get(name=event_name)
-        event_instance = event.trigger(user, data, async=async)
+        event_instance = event.trigger(
+            recipient_email, user, data, async=async)
 
         if event_instance.state == 'error':
             if event_instance.result_code == '2008':
                 if create_user_if_needed:
-                    api.create_contact(user.email)
-                    event_instance = event.trigger(user, data, async=async)
+                    api.create_contact(recipient_email)
+                    event_instance = event.trigger(
+                        recipient_email, user, data, async=async)
 
         return event_instance

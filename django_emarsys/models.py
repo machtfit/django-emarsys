@@ -28,7 +28,8 @@ class Event(models.Model):
     def __str__(self):
         return self.name
 
-    def trigger(self, user, data=None, source='automatic', async=False):
+    def trigger(self, recipient_email, user=None, data=None,
+                source='automatic', async=False):
         if async:
             raise NotImplementedError
 
@@ -37,8 +38,6 @@ class Event(models.Model):
 
         context = {'global': self.get_placeholder_data(
             **dict(data, user=user))}
-
-        recipient_email = user.email
 
         event_instance = self.eventinstance_set.create(
             recipient_email=recipient_email,
@@ -130,7 +129,7 @@ class EventInstance(models.Model):
 
     event = models.ForeignKey(Event)
     recipient_email = models.CharField(max_length=1024)
-    user = models.ForeignKey(get_user_model())
+    user = models.ForeignKey(get_user_model(), null=True)
     context = models.TextField()
     data = GenericRelation('EventInstanceData')
     when = models.DateTimeField(auto_now_add=True)
