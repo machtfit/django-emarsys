@@ -2,7 +2,11 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from django.db import models
+
+from emarsys import EmarsysError
 
 from . import api
 
@@ -29,27 +33,30 @@ class EventManager(models.Manager):
         num_updated_ids = 0
         num_deleted_ids = 0
 
-        emarsys_events = api.get_events()
-        for local_event in self.all():
-            emarsys_event_id = emarsys_events.get(local_event.name)
-            if emarsys_event_id:
-                if not local_event.emarsys_id:
-                    num_added_ids += 1
-                elif local_event.emarsys_id != emarsys_event_id:
-                    num_updated_ids += 1
+        try:
+            emarsys_events = api.get_events()
+            for local_event in self.all():
+                emarsys_event_id = emarsys_events.get(local_event.name)
+                if emarsys_event_id:
+                    if not local_event.emarsys_id:
+                        num_added_ids += 1
+                    elif local_event.emarsys_id != emarsys_event_id:
+                        num_updated_ids += 1
 
-                local_event.emarsys_id = emarsys_event_id
-                del emarsys_events[local_event.name]
-            else:
-                if local_event.emarsys_id:
-                    num_deleted_ids += 1
-                local_event.emarsys_id = None
+                    local_event.emarsys_id = emarsys_event_id
+                    del emarsys_events[local_event.name]
+                else:
+                    if local_event.emarsys_id:
+                        num_deleted_ids += 1
+                    local_event.emarsys_id = None
 
-            local_event.save()
+                local_event.save()
 
-        for emarsys_event_name, emarsys_event_id in emarsys_events.items():
-            self.create(emarsys_id=emarsys_event_id, name=emarsys_event_name)
-            num_new_events += 1
+            for emarsys_event_name, emarsys_event_id in emarsys_events.items():
+                self.create(emarsys_id=emarsys_event_id, name=emarsys_event_name)
+                num_new_events += 1
+        except EmarsysError as e:
+            sys.stderr.write('Emarsys error: {}\n'.format(e))
 
         return num_new_events, num_added_ids, num_updated_ids, num_deleted_ids
 
