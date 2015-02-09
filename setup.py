@@ -12,7 +12,9 @@ setup(name='django_emarsys',
       packages=['django_emarsys',
                 'django_emarsys.management',
                 'django_emarsys.management.commands',
-                'oscar_emarsys_dashboard'],
+                'oscar_emarsys',
+                'oscar_emarsys.dashboard',
+                'oscar_emarsys.dashboard.emarsys'],
       include_package_data=True,
       install_requires=[
           'python-emarsys==0.2'
