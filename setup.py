@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='django_emarsys',
-      version='0.11',
+      version='0.12',
       description='Django and Oscar glue for Emarsys events',
       license="MIT",
       author='Markus Bertheau',
