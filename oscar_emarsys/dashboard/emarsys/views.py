@@ -166,7 +166,10 @@ class EventInstanceListView(SearchFormMixin, SearchMixin, SingleTableView):
     template_name = 'dashboard/emarsys/event_instance_list.html'
 
     search = {
-        'name': 'event__name__icontains',
+        'firstname': 'user__first_name__icontains',
+        'lastname': 'user__last_name__icontains',
+        'email': 'recipient_email__icontains',
+        'event': 'event__name__icontains',
         'id': 'event__emarsys_id',
     }
 
