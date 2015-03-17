@@ -49,3 +49,4 @@ class EventInstanceTable(DashboardTable):
         model = EventInstance
         fields = ('when', 'recipient_email', 'event', 'source', 'result',
                   'state')
+        order_by = '-when'
