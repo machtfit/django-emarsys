@@ -154,6 +154,15 @@ class EventDataLookupView(EventTriggerMixin, SingleObjectMixin,
 
         return queryset
 
+    def format_object(self, obj):
+        if not hasattr(obj, 'emarsys_format'):
+            return super(EventDataLookupView, self).format_object(obj)
+
+        return {
+            'id': obj.pk,
+            'text': obj.emarsys_format
+        }
+
     def lookup_filter(self, queryset, query):
         if hasattr(queryset, 'emarsys_filter'):
             return queryset.emarsys_filter(query)
