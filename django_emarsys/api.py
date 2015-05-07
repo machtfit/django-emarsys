@@ -70,6 +70,33 @@ def _create_contacts(contacts):
     return len(result['ids']), result.get('errors', {})
 
 
+def update_contacts(contacts):
+    contacts = map(_transform_contact_data, contacts)
+
+    # Filter contact data using whitelist
+    if settings.EMARSYS_RECIPIENT_WHITELIST is not None:
+        contacts = filter(lambda contact: contact[3]  # 3=email
+                          in settings.EMARSYS_RECIPIENT_WHITELIST, contacts)
+
+    contacts = list(contacts)
+
+    assert len(contacts) <= BATCH_SIZE
+
+    if not contacts:
+        return 0, [], []
+
+    num_successful, errors = _update_contacts(contacts)
+
+    missing_contacts = [email
+                        for email, error_dict in errors.items()
+                        if '2008' in error_dict]
+    failed_contacts = [(email, error_dict)
+                       for email, error_dict in errors.items()
+                       if '2008' not in error_dict]
+
+    return num_successful, missing_contacts, failed_contacts
+
+
 def _update_contacts(contacts):
     """
     Returns
