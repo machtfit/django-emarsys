@@ -66,11 +66,11 @@ class EventManager(models.Manager):
         event_instance = event.trigger(
             recipient_email, user, data, async=async)
 
-        if event_instance.state == 'error':
-            if event_instance.result_code == '2008':
-                if create_user_if_needed:
-                    api.create_contact(recipient_email)
-                    event_instance = event.trigger(
-                        recipient_email, user, data, async=async)
+        if (event_instance.state == 'error'
+                and event_instance.result_code == '2008'
+                and create_user_if_needed):
+            api.create_contact(recipient_email)
+            event_instance = event.trigger(
+                recipient_email, user, data, async=async)
 
         return event_instance
