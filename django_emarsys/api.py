@@ -33,8 +33,9 @@ def trigger_event(event_id, email, context):
     )
 
 
-def create_contact(email):
-    client.call('/api/v2/contact', 'POST', {"3": email})
+def create_contact(contact):
+    contact = _transform_contact_data(contact)
+    client.call('/api/v2/contact', 'POST', contact)
 
 
 def get_fields():

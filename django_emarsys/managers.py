@@ -69,7 +69,7 @@ class EventManager(models.Manager):
         if (event_instance.state == 'error'
                 and event_instance.result_code == '2008'
                 and create_user_if_needed):
-            api.create_contact(recipient_email)
+            api.create_contact(user.get_emarsys_contact_data(creation=True))
             event_instance = event.trigger(
                 recipient_email, user, data, async=async)
 
