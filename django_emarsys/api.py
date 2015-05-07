@@ -93,7 +93,8 @@ def get_contact_data(email):
                        {'keyId': '3', 'keyValues': [email]})
 
 
-def sync_contacts(contacts, create_missing=True, create_only_fields=None):
+def sync_contacts(contacts, create_missing=True, create_only_fields=None,
+                  quiet=True):
     """
     contacts is a list of dictionaries like this:
         [{
@@ -107,6 +108,10 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None):
     The dictionary keys are mapped to emarsys field ids using
     settings.EMARSYS_FIELDS, which can be generated with `get_fields()`.
     """
+
+    def log_debug(message):
+        if not quiet:
+            print("{}\n".format(message))
 
     def chunked(it, n):
         """
@@ -151,11 +156,11 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None):
 
     # Update contacts
     for chunk_of_contacts in chunked(update_contacts, BATCH_SIZE):
-        log.debug("Updating a chunk of {} users."
+        log_debug("Updating a chunk of {} users."
                   .format(len(chunk_of_contacts)))
 
         num_successful, errors = _update_contacts(chunk_of_contacts)
-        log.debug('{} users updated, {} users errored.'
+        log_debug('{} users updated, {} users errored.'
                   .format(num_successful, len(errors)))
 
         total_updated += num_successful
@@ -174,11 +179,11 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None):
 
         # Create contacts
         for chunk_of_contacts in chunked(create_contacts, BATCH_SIZE):
-            log.debug("Creating a chunk of {} users."
+            log_debug("Creating a chunk of {} users."
                       .format(len(chunk_of_contacts)))
 
             num_successful, errors = _create_contacts(chunk_of_contacts)
-            log.debug('{} users created, {} users errored.'
+            log_debug('{} users created, {} users errored.'
                       .format(num_successful, len(errors)))
 
             total_created += num_successful
