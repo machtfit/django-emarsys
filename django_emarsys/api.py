@@ -14,7 +14,7 @@ client = emarsys.Emarsys(settings.EMARSYS_ACCOUNT,
                          settings.EMARSYS_BASE_URI)
 
 
-BATCH_SIZE = 10000
+BATCH_SIZE = 1000
 
 
 def get_events():
