@@ -120,8 +120,7 @@ def get_contact_data(email):
                        {'keyId': '3', 'keyValues': [email]})
 
 
-def sync_contacts(contacts, create_missing=True, create_only_fields=None,
-                  quiet=True):
+def sync_contacts(contacts, create_missing=True, quiet=True):
     """
     contacts is a list of dictionaries like this:
         [{
@@ -134,6 +133,8 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None,
 
     The dictionary keys are mapped to emarsys field ids using
     settings.EMARSYS_FIELDS, which can be generated with `get_fields()`.
+    Fields in settings.EMARSYS_CREATE_ONLY_FIELDS are not sent when updating a
+    contact.
     """
 
     def log_debug(message):
@@ -150,9 +151,6 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None,
             if not chunk:
                 return
             yield chunk
-
-    if not create_only_fields:
-        create_only_fields = []
 
     total_updated = 0
     total_created = 0
@@ -176,7 +174,8 @@ def sync_contacts(contacts, create_missing=True, create_only_fields=None,
 
     # Filter out fields in create_only_fields for updating
     create_only_field_ids = [settings.EMARSYS_FIELDS[field_name][0]
-                             for field_name in create_only_fields]
+                             for field_name in
+                             settings.EMARSYS_CREATE_ONLY_FIELDS]
     update_contacts = [{k: v for k, v in contact.items()
                         if k not in create_only_field_ids}
                        for contact in update_contacts]
