@@ -61,7 +61,7 @@ class EventManager(models.Manager):
         return num_new_events, num_added_ids, num_updated_ids, num_deleted_ids
 
     def trigger(self, event_name, recipient_email, user=None, data=None,
-                create_user_if_needed=True, async=False):
+                create_user_if_needed=True, async=False, get_create_data=None):
         event = self.get(name=event_name)
         event_instance = event.trigger(
             recipient_email, user, data, async=async)
@@ -69,7 +69,13 @@ class EventManager(models.Manager):
         if (event_instance.state == 'error'
                 and event_instance.result_code == '2008'
                 and create_user_if_needed):
-            api.create_contact(user.get_emarsys_contact_data(creation=True))
+
+            if get_create_data is not None:
+                contact_data = get_create_data()
+            else:
+                contact_data = {'E-Mail': recipient_email}
+
+            api.create_contact(contact_data)
             event_instance = event.trigger(
                 recipient_email, user, data, async=async)
 
