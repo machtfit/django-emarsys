@@ -14,7 +14,6 @@ from django.db import models, transaction
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
-from oscar.core.compat import get_user_model
 
 from . import api, managers, context_provider_registry
 
@@ -129,7 +128,7 @@ class EventInstance(models.Model):
 
     event = models.ForeignKey(Event)
     recipient_email = models.CharField(max_length=1024)
-    user = models.ForeignKey(get_user_model(), null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
     context = models.TextField()
     data = GenericRelation('EventInstanceData')
     when = models.DateTimeField(auto_now_add=True)
