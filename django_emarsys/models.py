@@ -12,6 +12,7 @@ from django.contrib.contenttypes.generic import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.html import conditional_escape
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -35,8 +36,10 @@ class Event(models.Model):
         if data is None:
             data = {}
 
-        context = {'global': self.get_placeholder_data(
-            **dict(data, user=user))}
+        context = {'global': {
+            key: conditional_escape(value)
+            for key, value
+            in self.get_placeholder_data(**dict(data, user=user)).items()}}
 
         event_instance = self.eventinstance_set.create(
             recipient_email=recipient_email,
