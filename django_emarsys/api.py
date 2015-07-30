@@ -9,21 +9,29 @@ from django.conf import settings
 
 log = logging.getLogger(__name__)
 
-client = emarsys.Emarsys(settings.EMARSYS_ACCOUNT,
-                         settings.EMARSYS_PASSWORD,
-                         settings.EMARSYS_BASE_URI)
+_client = None
+
+
+def Client():
+    global _client
+    if not _client:
+        _client = emarsys.Emarsys(settings.EMARSYS_ACCOUNT,
+                                  settings.EMARSYS_PASSWORD,
+                                  settings.EMARSYS_BASE_URI)
+
+    return _client
 
 
 BATCH_SIZE = 1000
 
 
 def get_events():
-    response = client.call('/api/v2/event', 'GET')
+    response = Client().call('/api/v2/event', 'GET')
     return {event['name']: int(event['id']) for event in response}
 
 
 def trigger_event(event_id, email, context):
-    client.call(
+    Client().call(
         '/api/v2/event/{}/trigger'.format(event_id), 'POST',
         {
             "key_id": 3,
@@ -35,14 +43,14 @@ def trigger_event(event_id, email, context):
 
 def create_contact(contact):
     contact = _transform_contact_data(contact)
-    client.call('/api/v2/contact', 'POST', contact)
+    Client().call('/api/v2/contact', 'POST', contact)
 
 
 def get_fields():
     """
     Use this to update settings.EMARSYS_FIELDS.
     """
-    response = client.call('/api/v2/field', 'GET')
+    response = Client().call('/api/v2/field', 'GET')
     return {field['name']: (field['id'], field['application_type'])
             for field in response}
 
@@ -62,7 +70,7 @@ def _create_contacts(contacts):
 
     log.debug("Attempting to create {} contacts.".format(len(contacts)))
 
-    result = client.call('/api/v2/contact', 'POST', {'contacts': contacts})
+    result = Client().call('/api/v2/contact', 'POST', {'contacts': contacts})
 
     log.debug("{} contacts created, {} contact creations failed"
               .format(len(result['ids']), len(result.get('errors', {}))))
@@ -107,7 +115,7 @@ def _update_contacts(contacts):
 
     log.debug("Attempting to update {} contacts.".format(len(contacts)))
 
-    result = client.call('/api/v2/contact', 'PUT', {'contacts': contacts})
+    result = Client().call('/api/v2/contact', 'PUT', {'contacts': contacts})
 
     log.debug("{} contacts update, {} contact updates failed"
               .format(len(result['ids']), len(result.get('errors', {}))))
@@ -116,8 +124,8 @@ def _update_contacts(contacts):
 
 
 def get_contact_data(email):
-    return client.call('/api/v2/contact/getdata', 'POST',
-                       {'keyId': '3', 'keyValues': [email]})
+    return Client().call('/api/v2/contact/getdata', 'POST',
+                         {'keyId': '3', 'keyValues': [email]})
 
 
 def sync_contacts(contacts, create_missing=True, quiet=True):
@@ -235,7 +243,7 @@ def get_lists():
 
     Use this to set settings.EMARSYS_LISTS.
     """
-    result = client.call('/api/v2/contactlist', 'GET')
+    result = Client().call('/api/v2/contactlist', 'GET')
     return {list['name']: list['id'] for list in result}
 
 
@@ -248,8 +256,8 @@ def create_list(name):
 
     Returns 'list_id'.
     """
-    result = client.call('/api/v2/contactlist', 'POST',
-                         {'name': name})
+    result = Client().call('/api/v2/contactlist', 'POST',
+                           {'name': name})
     return result['id']
 
 
@@ -264,8 +272,8 @@ def get_list(name):
     """
 
     list_id = settings.EMARSYS_LISTS[name]
-    result = client.call('/api/v2/contactlist/{}/contacts'.format(list_id),
-                         'GET')
+    result = Client().call('/api/v2/contactlist/{}/contacts'.format(list_id),
+                           'GET')
     return result
 
 
@@ -284,6 +292,6 @@ def replace_contactlist(name, emails):
     """
 
     list_id = settings.EMARSYS_LISTS[name]
-    result = client.call('/api/v2/contactlist/{}/replace'.format(list_id),
-                         'POST', {'external_ids': emails})
+    result = Client().call('/api/v2/contactlist/{}/replace'.format(list_id),
+                           'POST', {'external_ids': emails})
     return result['inserted_contacts'], result['errors']
