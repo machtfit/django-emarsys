@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for sandbox project.
 
@@ -9,6 +10,9 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
+from __future__ import unicode_literals
+
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -87,3 +91,12 @@ EMARSYS_ACCOUNT = 'company001'
 EMARSYS_PASSWORD = 'secret'
 EMARSYS_BASE_URI = 'https://suiteN.emarsys.net'
 EMARSYS_USE_NULL_GENERIC_CONTEXT_PROVIDER = True
+
+EMARSYS_EVENTS = {
+    "to User, registration complete": {
+        'user': ("User", "auth.User"),
+    },
+    "to Admin, registration complete": {
+        'user': ("User", "auth.User"),
+    },
+}
