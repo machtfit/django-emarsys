@@ -7,10 +7,6 @@ import logging
 from jsonfield import JSONField
 
 from django.apps import apps
-from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.generic import GenericRelation
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -33,84 +29,7 @@ class EventParam:
                 self.model == o.model)
 
 
-# deprecated
 @python_2_unicode_compatible
-class Event(models.Model):
-    emarsys_id = models.IntegerField(null=True, unique=True)
-    name = models.CharField(max_length=1024, blank=True, unique=True)
-    kwargs = models.ManyToManyField(ContentType, through='EventData')
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        permissions = [('can_trigger_event', _('Can trigger emarsys events.'))]
-        ordering = ['name']
-
-
-# deprecated
-@python_2_unicode_compatible
-class EventData(models.Model):
-    """
-    e.eventdata_set.create(
-        content_type=ContentType.objects.get_for_model(User),
-        name="Benutzer",
-        kwarg_name="user")
-    """
-    event = models.ForeignKey(Event)
-    name = models.CharField(max_length=1024)
-    kwarg_name = models.CharField(max_length=1024)
-    content_type = models.ForeignKey(ContentType)
-
-    def __str__(self):
-        return "({}) {}={}".format(
-            self.name, self.kwarg_name, self.content_type)
-
-    class Meta:
-        unique_together = [('event', 'kwarg_name'),
-                           ('event', 'name')]
-
-
-# deprecated
-@python_2_unicode_compatible
-class EventInstance(models.Model):
-    STATE_CHOICES = [('sending', 'sending'),
-                     ('error', 'error'),
-                     ('success', 'success')]
-
-    SOURCE_CHOICES = [('automatic', 'automatic'),
-                      ('manual', 'manual')]
-
-    event = models.ForeignKey(Event)
-    recipient_email = models.CharField(max_length=1024)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
-    context = models.TextField()
-    data = GenericRelation('EventInstanceData')
-    when = models.DateTimeField(auto_now_add=True)
-    source = models.CharField(max_length=1024, choices=SOURCE_CHOICES)
-    result = models.CharField(max_length=1024, blank=True)
-    result_code = models.CharField(max_length=1024, blank=True)
-    state = models.CharField(max_length=1024, choices=STATE_CHOICES,
-                             default='sending')
-
-    def __str__(self):
-        return 'at {}: {}'.format(self.when, self.event.name)
-
-
-# deprecated
-class EventInstanceData(models.Model):
-    event_trigger = models.ForeignKey(EventInstance)
-    event_data = models.ForeignKey(EventData)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
-
-    class Meta:
-        unique_together = [('event_trigger', 'event_data')]
-
-
-# new classes
-
 class NewEvent(models.Model):
     name = models.CharField(max_length=1024, unique=True)
     emarsys_id = models.IntegerField()
