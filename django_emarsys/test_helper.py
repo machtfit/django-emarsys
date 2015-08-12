@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from collections import namedtuple
 import json
 
-from django_emarsys.models import EventInstance
+from .models import EventInstance
 
 Event = namedtuple('Event', 'name context')
 
