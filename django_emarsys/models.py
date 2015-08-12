@@ -30,7 +30,7 @@ class EventParam:
 
 
 @python_2_unicode_compatible
-class NewEvent(models.Model):
+class Event(models.Model):
     name = models.CharField(max_length=1024, unique=True)
     emarsys_id = models.IntegerField()
 
@@ -48,7 +48,7 @@ class NewEvent(models.Model):
 
 
 @python_2_unicode_compatible
-class NewEventInstance(models.Model):
+class EventInstance(models.Model):
     STATE_SENDING = "sending"
     STATE_ERROR = "error"
     STATE_SUCCESS = "success"
@@ -78,7 +78,7 @@ class NewEventInstance(models.Model):
     def handle_error(self, msg):
         log.error("error for event id={}: {}".format(self.id, msg))
         self.result = unicode(msg)
-        self.state = NewEventInstance.STATE_ERROR
+        self.state = EventInstance.STATE_ERROR
         self.save()
 
     def handle_emarsys_error(self, emarsys_error):
@@ -86,18 +86,18 @@ class NewEventInstance(models.Model):
                   .format(self.id, emarsys_error))
         self.result = 'Emarsys error: {}'.format(emarsys_error)
         self.result_code = emarsys_error.code
-        self.state = NewEventInstance.STATE_ERROR
+        self.state = EventInstance.STATE_ERROR
         self.save()
 
     def handle_success(self):
-        self.state = NewEventInstance.STATE_SUCCESS
+        self.state = EventInstance.STATE_SUCCESS
         self.save()
 
     def label(self):
         return ({
-            NewEventInstance.STATE_SENDING: 'default',
-            NewEventInstance.STATE_ERROR: 'important',
-            NewEventInstance.STATE_SUCCESS: 'success'}[self.state], self.state)
+            EventInstance.STATE_SENDING: 'default',
+            EventInstance.STATE_ERROR: 'important',
+            EventInstance.STATE_SUCCESS: 'success'}[self.state], self.state)
 
     def set_context(self, context):
         self.context = context
@@ -161,7 +161,7 @@ class NewEventInstance(models.Model):
                 for argument in self.data.keys()}
 
     def get_event_pk(self):
-        return NewEvent.objects.get(name=self.event_name).pk
+        return Event.objects.get(name=self.event_name).pk
 
     def __str__(self):
         return 'at {}: {}'.format(self.when, self.event_name)

@@ -13,7 +13,7 @@ from . import api
 from .context_provider_registry import get_context_provider
 from .exceptions import (BadDataError, DjangoEmarsysError,
                          UnknownEventNameError)
-from .models import NewEvent, NewEventInstance, EventParam
+from .models import Event, EventInstance, EventParam
 
 log = logging.getLogger(__name__)
 
@@ -34,8 +34,8 @@ def get_parameter_for_event(event_name, argument):
 
 def get_event_id(name):
     try:
-        return NewEvent.objects.get(name=name).emarsys_id
-    except NewEvent.DoesNotExist:
+        return Event.objects.get(name=name).emarsys_id
+    except Event.DoesNotExist:
         pass
 
     log.info("Emarsys-ID for event '{name}' unknown, "
@@ -44,8 +44,8 @@ def get_event_id(name):
     sync_events()
 
     try:
-        return NewEvent.objects.get(name=name).emarsys_id
-    except NewEvent.DoesNotExist:
+        return Event.objects.get(name=name).emarsys_id
+    except Event.DoesNotExist:
         pass
 
     return None
@@ -58,13 +58,13 @@ def sync_events():
     In particular:
         * Add events that don't exist locally.
         * Update changed IDs.
-        * Delete NewEvent objects if their name isn't reported by Emarsys
-          anymore. There are no foreign keys pointing to NewEvent, so this
+        * Delete Event objects if their name isn't reported by Emarsys
+          anymore. There are no foreign keys pointing to Event, so this
           is safe.
 
     Events are identified by their name. This allows adding and
     implementing events in advance without knowing their emarsys id.
-    Syncing will then add a NewEvent object with the emarsys ID so that they
+    Syncing will then add a Event object with the emarsys ID so that they
     can be triggered.
 
     :return: num_new_events
@@ -83,7 +83,7 @@ def sync_events():
 
     known_event_names = set(settings.EMARSYS_EVENTS.keys())
 
-    for local_event in NewEvent.objects.all():
+    for local_event in Event.objects.all():
         emarsys_event_id = emarsys_events.get(local_event.name)
         if not emarsys_event_id or local_event.name not in known_event_names:
             local_event.delete()
@@ -100,11 +100,11 @@ def sync_events():
         if emarsys_event_name not in known_event_names:
             continue
 
-        NewEvent.objects.create(emarsys_id=emarsys_event_id,
-                                name=emarsys_event_name)
+        Event.objects.create(emarsys_id=emarsys_event_id,
+                             name=emarsys_event_name)
         num_new_events += 1
 
-    all_synced_event_names = set(NewEvent.objects.all()
+    all_synced_event_names = set(Event.objects.all()
                                  .values_list('name', flat=True))
     unsynced_event_names = list(known_event_names - all_synced_event_names)
 
@@ -143,7 +143,7 @@ def trigger_event(event_name, recipient_email, data=None,
         source=source,
         data=data)
 
-    if (event.state == NewEventInstance.STATE_ERROR
+    if (event.state == EventInstance.STATE_ERROR
             and event.result_code == '2008'
             and create_user_if_needed):
 
@@ -166,7 +166,7 @@ def trigger_event(event_name, recipient_email, data=None,
 def _create_event_instance(event_name, recipient_email, emarsys_event_id,
                            source, data):
     """
-    A `NewEventInstance` object is instantiated. All data validation is
+    A `EventInstance` object is instantiated. All data validation is
     done here, passing along correct user `data`.
 
     Upon any error the resulting event instance's will store the error message
@@ -175,7 +175,7 @@ def _create_event_instance(event_name, recipient_email, emarsys_event_id,
     :returns: the new event object
 
     """
-    event = NewEventInstance.objects.create(
+    event = EventInstance.objects.create(
         event_name=event_name,
         recipient_email=recipient_email,
         source=source,

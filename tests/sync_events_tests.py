@@ -9,13 +9,13 @@ from django.test import TestCase
 from django.test.utils import override_settings
 
 from django_emarsys.event import sync_events
-from django_emarsys.models import NewEvent
+from django_emarsys.models import Event
 
 
 class SyncEventTestCase(TestCase):
     @classmethod
     def setUp(self):
-        NewEvent.objects.all()
+        Event.objects.all()
 
     @override_settings()
     @mock.patch("django_emarsys.api.get_events")
@@ -35,9 +35,9 @@ class SyncEventTestCase(TestCase):
 
         self.assertEqual(num_new_events, 2)
         self.assertEqual(
-            NewEvent.objects.get(name='töst event 1').emarsys_id, 1)
+            Event.objects.get(name='töst event 1').emarsys_id, 1)
         self.assertEqual(
-            NewEvent.objects.get(name='töst event 2').emarsys_id, 2)
+            Event.objects.get(name='töst event 2').emarsys_id, 2)
 
     @override_settings()
     @mock.patch("django_emarsys.api.get_events")
@@ -53,18 +53,18 @@ class SyncEventTestCase(TestCase):
             },
         }
 
-        NewEvent.objects.create(name='töst event 1', emarsys_id=1)
+        Event.objects.create(name='töst event 1', emarsys_id=1)
         # this one will be updated to 2
-        NewEvent.objects.create(name='töst event 2', emarsys_id=3)
+        Event.objects.create(name='töst event 2', emarsys_id=3)
 
         num_new_events, num_updated_ids, num_deleted_ids, \
             unsynced_event_names = sync_events()
 
         self.assertEqual(num_updated_ids, 1)
         self.assertEqual(
-            NewEvent.objects.get(name='töst event 1').emarsys_id, 1)
+            Event.objects.get(name='töst event 1').emarsys_id, 1)
         self.assertEqual(
-            NewEvent.objects.get(name='töst event 2').emarsys_id, 2)
+            Event.objects.get(name='töst event 2').emarsys_id, 2)
 
     @override_settings()
     @mock.patch("django_emarsys.api.get_events")
@@ -74,13 +74,13 @@ class SyncEventTestCase(TestCase):
         settings.EMARSYS_EVENTS = {
         }
 
-        NewEvent.objects.create(name='töst event 1', emarsys_id=1)
+        Event.objects.create(name='töst event 1', emarsys_id=1)
 
         num_new_events, num_updated_ids, num_deleted_ids, \
             unsynced_event_names = sync_events()
 
         self.assertEqual(num_deleted_ids, 1)
-        self.assertEqual(NewEvent.objects.all().count(), 0)
+        self.assertEqual(Event.objects.all().count(), 0)
 
     @override_settings()
     @mock.patch("django_emarsys.api.get_events")

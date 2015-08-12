@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import json
 from collections import namedtuple
 
-from .models import NewEventInstance
+from .models import EventInstance
 
 Event = namedtuple('Event', 'name context')
 
@@ -26,7 +26,7 @@ class EmarsysTestMixin(object):
 
         for i, event_name in enumerate(events):
             instance = \
-                NewEventInstance.objects.filter(event_name=event_name).first()
+                EventInstance.objects.filter(event_name=event_name).first()
 
             self.assertIsNotNone(
                 instance, "Event no. {} '{}' not found.".format(i, event_name))
@@ -39,13 +39,13 @@ class EmarsysTestMixin(object):
 
         if all:
             self.assertEqual(
-                0, NewEventInstance.objects.count(),
+                0, EventInstance.objects.count(),
                 "More events have been triggered:\n{}"
                 .format(", ".join(instance.event_name
                                   for instance in
-                                  NewEventInstance.objects.all())))
+                                  EventInstance.objects.all())))
 
         return ret_events
 
     def resetEmarsysEvents(self):
-        NewEventInstance.objects.all().delete()
+        EventInstance.objects.all().delete()

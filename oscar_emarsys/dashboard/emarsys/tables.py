@@ -9,7 +9,7 @@ from django_tables2 import A, LinkColumn, Column
 
 from oscar.core.loading import get_class
 
-from django_emarsys.models import NewEvent, NewEventInstance
+from django_emarsys.models import Event, EventInstance
 
 DashboardTable = get_class('dashboard.tables', 'DashboardTable')
 
@@ -31,7 +31,7 @@ class EventTable(DashboardTable):
     caption_plural = "{count} Events"
 
     class Meta(DashboardTable.Meta):
-        model = NewEvent
+        model = Event
         fields = ()
         template = 'dashboard/emarsys/event_table.html'
 
@@ -46,7 +46,7 @@ class EventInstanceTable(DashboardTable):
     caption_plural = "{count} Event Instances"
 
     class Meta(DashboardTable.Meta):
-        model = NewEventInstance
+        model = EventInstance
         fields = ('when', 'recipient_email', 'event_name', 'source', 'result',
                   'state')
         order_by = '-when'

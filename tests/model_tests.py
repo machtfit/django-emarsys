@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from django_emarsys.models import NewEventInstance
+from django_emarsys.models import EventInstance
 from django_emarsys.event import EventParam
 
 
@@ -14,7 +14,7 @@ class ModelTestCase(TestCase):
     def setUpClass(cls):
         cls.user = User.objects.create(username="test_user",
                                        email="test.user@machtfit.de")
-        cls.event = NewEventInstance.objects.create(event_name='foobar')
+        cls.event = EventInstance.objects.create(event_name='foobar')
 
     @classmethod
     def tearDownClass(cls):

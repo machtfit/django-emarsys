@@ -10,7 +10,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import User
 
 from django_emarsys.event import trigger_event
-from django_emarsys.models import NewEventInstance
+from django_emarsys.models import EventInstance
 
 
 class TriggerEventTestCase(TestCase):
@@ -31,7 +31,7 @@ class TriggerEventTestCase(TestCase):
         settings.EMARSYS_EVENTS = {}
         event = trigger_event("test event", "test.user@machtfit.de")
         self.assertIsNotNone(event)
-        self.assertEqual(event.state, NewEventInstance.STATE_ERROR)
+        self.assertEqual(event.state, EventInstance.STATE_ERROR)
         self.assertEqual(event.result, "unknown event name: 'test event'")
 
     @override_settings()
@@ -47,7 +47,7 @@ class TriggerEventTestCase(TestCase):
         event = trigger_event("test event", self.user.email,
                               data=dict(obj=self.user))
         self.assertIsNotNone(event)
-        self.assertEqual(event.state, NewEventInstance.STATE_ERROR)
+        self.assertEqual(event.state, EventInstance.STATE_ERROR)
         self.assertEqual(event.result,
                          "expected data args ['extra_user'], got ['obj']")
 
@@ -64,7 +64,7 @@ class TriggerEventTestCase(TestCase):
             "test event", self.user.email,
             data=dict(extra_user="NOT THE RIGHT OBJECT"))
         self.assertIsNotNone(event)
-        self.assertEqual(event.state, NewEventInstance.STATE_ERROR)
+        self.assertEqual(event.state, EventInstance.STATE_ERROR)
         self.assertEqual(event.result,
                          "expected instance of 'auth.User' for "
                          "argument 'extra_user': 'NOT THE RIGHT OBJECT'")
@@ -86,8 +86,8 @@ class TriggerEventTestCase(TestCase):
         event = trigger_event("test event", self.user.email,
                               data=dict(extra_user=self.user))
         self.assertIsNotNone(event)
-        self.assertEqual(event.state, NewEventInstance.STATE_SUCCESS)
-        self.assertEqual(event.source, NewEventInstance.SOURCE_AUTOMATIC)
+        self.assertEqual(event.state, EventInstance.STATE_SUCCESS)
+        self.assertEqual(event.source, EventInstance.SOURCE_AUTOMATIC)
         self.assertEqual(event.emarsys_id, TEST_EVENT_ID)
 
         mock_api_get_events.assert_called_with()
@@ -112,8 +112,8 @@ class TriggerEventTestCase(TestCase):
                               data=dict(extra_user=self.user),
                               manual=True)
         self.assertIsNotNone(event)
-        self.assertEqual(event.state, NewEventInstance.STATE_SUCCESS)
-        self.assertEqual(event.source, NewEventInstance.SOURCE_MANUAL)
+        self.assertEqual(event.state, EventInstance.STATE_SUCCESS)
+        self.assertEqual(event.source, EventInstance.SOURCE_MANUAL)
         self.assertEqual(event.emarsys_id, TEST_EVENT_ID)
 
         mock_api_get_events.assert_called_with()

@@ -17,7 +17,7 @@ from oscar.views.generic import ObjectLookupView
 
 from apps.views import SearchMixin, SearchFormMixin
 
-from django_emarsys.models import NewEvent, NewEventInstance
+from django_emarsys.models import Event, EventInstance
 from django_emarsys.context_provider_registry import ContextProviderException
 from django_emarsys.event import (get_parameter_for_event,
                                   get_placeholder_data,
@@ -28,7 +28,7 @@ from .tables import EventTable, EventInstanceTable
 
 
 class EventListView(SearchFormMixin, SearchMixin, SingleTableView):
-    model = NewEvent
+    model = Event
     table_class = EventTable
     template_name = 'dashboard/emarsys/event_list.html'
 
@@ -59,7 +59,7 @@ class EventsSyncView(FormView):
 
 
 class EventTriggerMixin(object):
-    model = NewEvent
+    model = Event
     context_object_name = 'event'
     form_class = EventTriggerForm
     template_name = 'dashboard/emarsys/event_trigger.html'
@@ -162,7 +162,7 @@ class EventDataLookupView(EventTriggerMixin, SingleObjectMixin,
 
 
 class EventInstanceListView(SearchFormMixin, SearchMixin, SingleTableView):
-    model = NewEventInstance
+    model = EventInstance
     table_class = EventInstanceTable
     template_name = 'dashboard/emarsys/event_instance_list.html'
 
@@ -178,7 +178,7 @@ class EventInstanceListView(SearchFormMixin, SearchMixin, SingleTableView):
 
 
 class EventInstanceView(DetailView):
-    model = NewEventInstance
+    model = EventInstance
     context_object_name = 'event_instance'
     template_name = 'dashboard/emarsys/event_instance.html'
 
