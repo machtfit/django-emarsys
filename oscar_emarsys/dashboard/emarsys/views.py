@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-import json
-
 from emarsys import EmarsysError
 
 from django.contrib import messages
@@ -15,20 +13,22 @@ from django.views.generic.edit import FormView
 
 from django_tables2 import SingleTableView
 
-from oscar.core.compat import get_user_model
 from oscar.views.generic import ObjectLookupView
 
 from apps.views import SearchMixin, SearchFormMixin
 
-from django_emarsys.models import Event, EventInstance
+from django_emarsys.models import NewEvent, NewEventInstance
 from django_emarsys.context_provider_registry import ContextProviderException
+from django_emarsys.event import (get_parameter_for_event,
+                                  get_placeholder_data,
+                                  trigger_event, sync_events)
 
 from .forms import EventTriggerForm
 from .tables import EventTable, EventInstanceTable
 
 
 class EventListView(SearchFormMixin, SearchMixin, SingleTableView):
-    model = Event
+    model = NewEvent
     table_class = EventTable
     template_name = 'dashboard/emarsys/event_list.html'
 
@@ -47,7 +47,7 @@ class EventsSyncView(FormView):
 
     def form_valid(self, form):
         try:
-            Event.objects.sync_events()
+            sync_events()
             messages.success(self.request, 'Events gesynct.')
         except EmarsysError as e:
             messages.error(self.request, 'Emarsys error: {}'.format(e))
@@ -59,7 +59,7 @@ class EventsSyncView(FormView):
 
 
 class EventTriggerMixin(object):
-    model = Event
+    model = NewEvent
     context_object_name = 'event'
     form_class = EventTriggerForm
     template_name = 'dashboard/emarsys/event_trigger.html'
@@ -83,23 +83,18 @@ class EventTriggerView(EventTriggerMixin, SingleObjectMixin, FormView):
         context = super(EventTriggerView, self).get_context_data(**kwargs)
         form = kwargs.get('form')
         if form and form.is_bound:
-            data = self.event.get_placeholder_data(**form.cleaned_data)
+            data = get_placeholder_data(self.event.name, **form.cleaned_data)
             context['placeholder_data'] = sorted(data.items())
         return context
 
     def form_valid(self, form):
-        if not self.event.emarsys_id:
-            Event.objects.sync_events()
-            self.event = Event.objects.get(pk=self.event.pk)
-
         recipient_email = form.cleaned_data.pop('recipient_email')
-        user = form.cleaned_data.pop('user')
 
-        event_instance = self.event.trigger(
-            recipient_email=recipient_email or user.email,
-            user=user,
+        event_instance = trigger_event(
+            event_name=self.event.name,
+            recipient_email=recipient_email,
             data=form.cleaned_data,
-            source='manual')
+            manual=True)
 
         if event_instance.state != 'success':
             messages.error(self.request, event_instance.result)
@@ -121,7 +116,8 @@ class EventPlaceholderDataView(EventTriggerMixin, SingleObjectMixin, FormView):
         form = kwargs.get('form')
         if form and form.is_bound:
             try:
-                data = self.event.get_placeholder_data(**form.cleaned_data)
+                data = get_placeholder_data(self.event.name,
+                                            **form.cleaned_data)
             except ContextProviderException as e:
                 context['placeholder_data_error'] = e
             else:
@@ -136,21 +132,17 @@ class EventPlaceholderDataView(EventTriggerMixin, SingleObjectMixin, FormView):
 class EventDataLookupView(EventTriggerMixin, SingleObjectMixin,
                           ObjectLookupView):
     def get(self, *args, **kwargs):
-        self.kwarg_name = kwargs.pop('name')
+        self.argument = kwargs.pop('argument')
         return super(EventDataLookupView, self).get(*args, **kwargs)
 
     def get_lookup_queryset(self):
-        if self.kwarg_name == 'user':
-            self.model = get_user_model()
-        else:
-            event_data = self.event.eventdata_set.get(
-                kwarg_name=self.kwarg_name)
-            self.model = event_data.content_type.model_class()
+        self.model = get_parameter_for_event(
+            self.event.name, self.argument).model_class()
 
         queryset = super(EventDataLookupView, self).get_lookup_queryset()
 
         if hasattr(queryset, "emarsys_kwarg_name_filter"):
-            queryset = queryset.emarsys_kwarg_name_filter(self.kwarg_name)
+            queryset = queryset.emarsys_kwarg_name_filter(self.argument)
 
         return queryset
 
@@ -170,16 +162,14 @@ class EventDataLookupView(EventTriggerMixin, SingleObjectMixin,
 
 
 class EventInstanceListView(SearchFormMixin, SearchMixin, SingleTableView):
-    model = EventInstance
+    model = NewEventInstance
     table_class = EventInstanceTable
     template_name = 'dashboard/emarsys/event_instance_list.html'
 
     search = {
-        'firstname': 'user__first_name__icontains',
-        'lastname': 'user__last_name__icontains',
         'email': 'recipient_email__icontains',
-        'event': 'event__name__icontains',
-        'id': 'event__emarsys_id',
+        'event': 'event_name__icontains',
+        'id': 'emarsys_id',
     }
 
     search_types = {
@@ -188,12 +178,12 @@ class EventInstanceListView(SearchFormMixin, SearchMixin, SingleTableView):
 
 
 class EventInstanceView(DetailView):
-    model = EventInstance
+    model = NewEventInstance
     context_object_name = 'event_instance'
     template_name = 'dashboard/emarsys/event_instance.html'
 
     def get_context_data(self, **kwargs):
         context = super(EventInstanceView, self).get_context_data(**kwargs)
-        context['placeholder_data'] = sorted(json.loads(
-            context['event_instance'].context)['global'].items())
+        context['placeholder_data'] = sorted(
+            context['event_instance'].context['global'].items())
         return context

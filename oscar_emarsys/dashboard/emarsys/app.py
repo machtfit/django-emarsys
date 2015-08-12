@@ -28,7 +28,7 @@ class EmarsysDashboardApplication(Application):
                 name='emarsys-events-sync'),
             url(r'^(?P<pk>\d+)/trigger/$', self.event_trigger_view.as_view(),
                 name='emarsys-event-trigger'),
-            url(r'^(?P<pk>\d+)/lookup/(?P<name>[^/]+)/$',
+            url(r'^(?P<pk>\d+)/lookup/(?P<argument>[^/]+)/$',
                 self.event_data_lookup_view.as_view(),
                 name='emarsys-event-data-lookup'),
             url(r'^(?P<pk>\d+)/placeholder-data/$',
