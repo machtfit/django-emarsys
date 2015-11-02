@@ -15,5 +15,5 @@ class Command(BaseCommand):
               " {} event ids deleted"
               .format(num_new_events, num_updated_ids, num_deleted_ids))
         if unsynced_event_names:
-            print("unsynced event names:\n    {}"
-                  .format('\n    '.join(unsynced_event_names)))
+            print(u"unsynced event names:\n    {}"
+                  .format(u'\n    '.join(unsynced_event_names)).encode('utf-8'))
