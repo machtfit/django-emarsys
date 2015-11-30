@@ -295,3 +295,11 @@ def replace_contactlist(name, emails):
     result = Client().call('/api/v2/contactlist/{}/replace'.format(list_id),
                            'POST', {'external_ids': emails})
     return result['inserted_contacts'], result['errors']
+
+
+def add_to_contactlist(name, emails):
+    list_id = settings.EMARSYS_LISTS[name]
+    result = Client().call('/api/v2/contactlist/{}/add'.format(list_id),
+                           'POST', {'external_ids': emails})
+
+    return result['inserted_contacts'], result['errors']
