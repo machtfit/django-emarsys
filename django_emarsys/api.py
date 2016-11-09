@@ -55,12 +55,34 @@ def get_fields():
             for field in response}
 
 
+def get_field_choices():
+    """
+    Use this to update settings.EMARSYS_FIELD_CHOICES.
+    """
+    field_choices = {}
+    for field_name, (field_id, field_type) in get_fields().items():
+        if field_type in ['multichoice', 'singlechoice']:
+            url = '/api/v2/field/{}/choice'.format(field_id)
+            choices = Client().call(url, 'GET')
+            field_choices[field_name] = {
+                choice['choice']: int(choice['id'])
+                for choice in choices}
+
+    return field_choices
+
+
 def _transform_contact_data_field_value(name, value):
     field_type = settings.EMARSYS_FIELDS[name][1]
     if field_type == 'multichoice':
         if name in settings.EMARSYS_FIELD_CHOICES:
-            return list(map(lambda v: settings.EMARSYS_FIELD_CHOICES[value],
-                            value))
+            choices = settings.EMARSYS_FIELD_CHOICES[name]
+            # remove values that are not known in EMARSYS_FIELD_CHOICES
+            return [choices[v]
+                    for v in value
+                    if v in choices]
+
+    if field_type == 'singlechoice':
+        return settings.EMARSYS_FIELD_CHOICES.get(name, {}).get(value)
 
     return value
 
