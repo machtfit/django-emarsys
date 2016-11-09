@@ -55,8 +55,19 @@ def get_fields():
             for field in response}
 
 
+def _transform_contact_data_field_value(name, value):
+    field_type = settings.EMARSYS_FIELDS[name][1]
+    if field_type == 'multichoice':
+        if name in settings.EMARSYS_FIELD_CHOICES:
+            return list(map(lambda v: settings.EMARSYS_FIELD_CHOICES[value],
+                            value))
+
+    return value
+
+
 def _transform_contact_data(contact):
-    return {settings.EMARSYS_FIELDS[name][0]: value
+    return {settings.EMARSYS_FIELDS[name][0]:
+            _transform_contact_data_field_value(name, value)
             for name, value in contact.items()}
 
 
