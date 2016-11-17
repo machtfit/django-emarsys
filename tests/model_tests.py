@@ -22,7 +22,7 @@ class ModelTestCase(TestCase):
         cls.event.delete()
 
     def test_set_and_get_parameter(self):
-        param = EventParam(argument='user', name='User', model='auth.User')
+        param = EventParam(argument='user', name='User', type_='auth.User')
         self.event.set_parameter(param, self.user)
         value, restored_param = self.event.get_parameter('user')
         self.assertEqual(value, self.user)

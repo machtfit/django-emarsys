@@ -10,6 +10,8 @@ from django.apps import apps
 from django.conf import settings
 from django.core.checks import Critical, Error, Warning
 
+from .models import EventParam
+
 
 _VALID_ARG = re.compile(r'^[a-z][a-z0-9_]*$')
 
@@ -165,7 +167,8 @@ def _validate_event_param(event, argument, param):
 
         return messages
 
-    name, model = param
+    name, type_ = param
+    event_param = EventParam(argument, name, type_)
 
     if not isinstance(name, basestring) or not name:
         messages.append(
@@ -173,7 +176,7 @@ def _validate_event_param(event, argument, param):
                   .format(name=name, event=event)))
 
     try:
-        apps.get_model(model)
+        apps.get_model(event_param.model)
     except (AttributeError, LookupError, ValueError) as e:
         # AttributeError occurs when "model" is not a string, because
         # get_model calls model.rsplit()
@@ -183,6 +186,6 @@ def _validate_event_param(event, argument, param):
         # "model" don't exist
         messages.append(
             Error("bad model '{model}' for event '{event}': {error}"
-                  .format(model=model, event=event, error=e)))
+                  .format(model=event_param.model, event=event, error=e)))
 
     return messages

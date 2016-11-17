@@ -15,10 +15,17 @@ log = logging.getLogger(__name__)
 
 
 class EventParam:
-    def __init__(self, argument, name, model):
+    def __init__(self, argument, name, type_):
         self.argument = argument
         self.name = name
-        self.model = model
+        self.type_ = type_
+
+        self.is_list = type_[0] == '[' and type_[-1] == ']'
+
+        if self.is_list:
+            self.model = type_[1:-1]
+        else:
+            self.model = type_
 
     def model_class(self):
         return apps.get_model(self.model)
@@ -26,7 +33,7 @@ class EventParam:
     def __eq__(self, o):
         return (self.argument == o.argument and
                 self.name == o.name and
-                self.model == o.model)
+                self.type_ == o.type_)
 
 
 @python_2_unicode_compatible
@@ -112,7 +119,7 @@ class EventInstance(models.Model):
                 EventParam(
                     argument="user",
                     name="User",
-                    model="auth.User"
+                    type_="auth.User"
                 ),
                 value=User.objects.get(pk=1)
             )
@@ -129,10 +136,15 @@ class EventInstance(models.Model):
         if not self.data:
             self.data = {}
 
+        if parameter.is_list:
+            pk = [x.pk for x in value]
+        else:
+            pk = value.pk
+
         self.data[parameter.argument] = (
             parameter.name,
             parameter.model,
-            value.pk,
+            pk,
         )
 
         self.save()
@@ -150,9 +162,12 @@ class EventInstance(models.Model):
         if not self.data:
             return None
 
-        name, model, pk = self.data[argument]
-        param = EventParam(argument=argument, name=name, model=model)
-        value = param.model_class().objects.get(pk=pk)
+        name, type_, pk = self.data[argument]
+        param = EventParam(argument=argument, name=name, type_=type_)
+        if param.is_list:
+            value = param.model_class().objects.filter(pk__in=pk)
+        else:
+            value = param.model_class().objects.get(pk=pk)
 
         return value, param
 

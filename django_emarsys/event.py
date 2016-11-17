@@ -24,11 +24,11 @@ def get_all_parameters_for_event(event_name):
 
 
 def get_parameter_for_event(event_name, argument):
-    name, model = settings.EMARSYS_EVENTS[event_name][argument]
+    name, type_ = settings.EMARSYS_EVENTS[event_name][argument]
     return EventParam(
         argument=argument,
         name=name,
-        model=model
+        type_=type_
     )
 
 
@@ -204,7 +204,16 @@ def _create_event_instance(event_name, recipient_email, emarsys_event_id,
             raise BadDataError(expected_params, given_params)
 
         for param in event_params.values():
-            if not isinstance(data[param.argument], param.model_class()):
+            if param.is_list:
+                class_ = param.model_class()
+                for arg in data[param.argument]:
+                    if not isinstance(arg, class_):
+                        raise ValueError("expected list of '{model}' for "
+                                         "argument '{argument}': '{value}'"
+                                         .format(model=param.model,
+                                                 argument=param.argument,
+                                                 value=arg))
+            elif not isinstance(data[param.argument], param.model_class()):
                 raise ValueError("expected instance of '{model}' for "
                                  "argument '{argument}': '{value}'"
                                  .format(model=param.model,
