@@ -143,7 +143,7 @@ class EventInstance(models.Model):
 
         self.data[parameter.argument] = (
             parameter.name,
-            parameter.model,
+            parameter.type_,
             pk,
         )
 
