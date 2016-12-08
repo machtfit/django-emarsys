@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.checks import Critical, Error, Warning
 
-from .models import EventParam
+from django_emarsys import EventParam
 
 
 _VALID_ARG = re.compile(r'^[a-z][a-z0-9_]*$')

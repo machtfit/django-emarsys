@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from django_emarsys.models import EventInstance
-from django_emarsys.event import EventParam
+from django_emarsys import EventParam
 
 
 class ModelTestCase(TestCase):

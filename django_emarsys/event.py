@@ -9,11 +9,11 @@ from django.utils.html import conditional_escape
 
 from emarsys import EmarsysError
 
-from . import api
+from . import api, EventParam
 from .context_provider_registry import get_context_provider
 from .exceptions import (BadDataError, DjangoEmarsysError,
                          UnknownEventNameError)
-from .models import Event, EventInstance, EventParam
+from .models import Event, EventInstance
 
 log = logging.getLogger(__name__)
 

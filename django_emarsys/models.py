@@ -6,34 +6,13 @@ import logging
 
 from jsonfield import JSONField
 
-from django.apps import apps
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from django_emarsys import EventParam
+
 log = logging.getLogger(__name__)
-
-
-class EventParam:
-    def __init__(self, argument, name, type_):
-        self.argument = argument
-        self.name = name
-        self.type_ = type_
-
-        self.is_list = type_[0] == '[' and type_[-1] == ']'
-
-        if self.is_list:
-            self.model = type_[1:-1]
-        else:
-            self.model = type_
-
-    def model_class(self):
-        return apps.get_model(self.model)
-
-    def __eq__(self, o):
-        return (self.argument == o.argument and
-                self.name == o.name and
-                self.type_ == o.type_)
 
 
 @python_2_unicode_compatible
