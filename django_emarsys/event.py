@@ -204,7 +204,9 @@ def _create_event_instance(event_name, recipient_email, emarsys_event_id,
             raise BadDataError(expected_params, given_params)
 
         for param in event_params.values():
-            if param.is_list:
+            if param.is_string:
+                pass
+            elif param.is_list:
                 class_ = param.model_class()
                 for arg in data[param.argument]:
                     if not isinstance(arg, class_):
@@ -221,7 +223,6 @@ def _create_event_instance(event_name, recipient_email, emarsys_event_id,
                                          value=data[param.argument]))
 
             event.set_parameter(param, data[param.argument])
-
     except (DjangoEmarsysError, ValueError) as e:
         event.handle_error(e)
         return event

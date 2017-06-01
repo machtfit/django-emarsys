@@ -15,6 +15,8 @@ class EventParam:
 
         self.is_list = type_[0] == '[' and type_[-1] == ']'
 
+        self.is_string = type_ == 'string'
+
         if self.is_list:
             self.model = type_[1:-1]
         else:
