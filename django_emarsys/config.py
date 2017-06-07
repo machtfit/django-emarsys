@@ -175,17 +175,18 @@ def _validate_event_param(event, argument, param):
             Error("invalid parameter name for event '{event}': '{name}'"
                   .format(name=name, event=event)))
 
-    try:
-        apps.get_model(event_param.model)
-    except (AttributeError, LookupError, ValueError) as e:
-        # AttributeError occurs when "model" is not a string, because
-        # get_model calls model.rsplit()
-        # ValueError occurs when "model" doesn't contain a period and
-        # therefore .rsplit() results in only one value to unpack
-        # LookupError occurs when either the app or model name in
-        # "model" don't exist
-        messages.append(
-            Error("bad model '{model}' for event '{event}': {error}"
-                  .format(model=event_param.model, event=event, error=e)))
+    if not event_param.is_string:
+        try:
+            apps.get_model(event_param.model)
+        except (AttributeError, LookupError, ValueError) as e:
+            # AttributeError occurs when "model" is not a string, because
+            # get_model calls model.rsplit()
+            # ValueError occurs when "model" doesn't contain a period and
+            # therefore .rsplit() results in only one value to unpack
+            # LookupError occurs when either the app or model name in
+            # "model" don't exist
+            messages.append(
+                Error("bad model '{model}' for event '{event}': {error}"
+                      .format(model=event_param.model, event=event, error=e)))
 
     return messages

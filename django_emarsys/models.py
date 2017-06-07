@@ -115,7 +115,9 @@ class EventInstance(models.Model):
         if not self.data:
             self.data = {}
 
-        if parameter.is_list:
+        if parameter.is_string:
+            pk = value
+        elif parameter.is_list:
             pk = [x.pk for x in value]
         else:
             pk = value.pk
@@ -143,7 +145,9 @@ class EventInstance(models.Model):
 
         name, type_, pk = self.data[argument]
         param = EventParam(argument=argument, name=name, type_=type_)
-        if param.is_list:
+        if param.is_string:
+            value = pk
+        elif param.is_list:
             value = param.model_class().objects.filter(pk__in=pk)
         else:
             value = param.model_class().objects.get(pk=pk)
@@ -151,8 +155,10 @@ class EventInstance(models.Model):
         return value, param
 
     def get_all_parameters(self):
-        return {argument: self.get_parameter(argument)
-                for argument in self.data.keys()}
+        if self.data:
+            return {argument: self.get_parameter(argument)
+                    for argument in self.data.keys()}
+        return {}
 
     def get_event_pk(self):
         return Event.objects.get(name=self.event_name).pk

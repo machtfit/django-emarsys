@@ -17,11 +17,15 @@ class EventTriggerForm(forms.Form):
         self.event = event
 
         for param in get_all_parameters_for_event(self.event.name).values():
-            widget = RemoteSelect(
-                lookup_url=reverse('dashboard:emarsys-event-data-lookup',
-                                   kwargs=dict(pk=event.pk,
-                                               argument=param.argument)))
-            self.fields[param.argument] = forms.ModelChoiceField(
-                label=param.name,
-                queryset=param.model_class().objects.all(),
-                widget=widget)
+            if not param.is_string:
+                widget = RemoteSelect(
+                    lookup_url=reverse('dashboard:emarsys-event-data-lookup',
+                                       kwargs=dict(pk=event.pk,
+                                                   argument=param.argument)))
+                self.fields[param.argument] = forms.ModelChoiceField(
+                    label=param.name,
+                    queryset=param.model_class().objects.all(),
+                    widget=widget)
+            else:
+                self.fields[param.argument] = forms.CharField(
+                    label=param.name)
