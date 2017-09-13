@@ -1,3 +1,2 @@
 include *.md
 include LICENSE
-recursive-include oscar_emarsys/dashboard/emarsys/templates *.html
