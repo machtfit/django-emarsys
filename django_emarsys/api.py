@@ -264,6 +264,13 @@ def sync_contacts(contacts, create_missing=True, quiet=True):
     return total_updated, total_created, missing_contacts, failed_contacts
 
 
+def unsubscribe_from_campaign(launch_list_id, email_id, contact_uid):
+    Client().call('/api/v2/email/unsubscribe', 'POST',
+                  {'launch_list_id': int(launch_list_id),
+                   'email_id': int(email_id),
+                   'contact_uid': contact_uid})
+
+
 # Lists
 # =====
 
