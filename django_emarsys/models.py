@@ -150,7 +150,7 @@ class EventInstance(models.Model):
         elif param.is_list:
             value = param.model_class().objects.filter(pk__in=pk)
         else:
-            value = param.model_class().objects.get(pk=pk)
+            value = param.model_class().objects.filter(pk=pk).first()
 
         return value, param
 
