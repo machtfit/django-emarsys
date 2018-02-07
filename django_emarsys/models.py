@@ -150,7 +150,10 @@ class EventInstance(models.Model):
         elif param.is_list:
             value = param.model_class().objects.filter(pk__in=pk)
         else:
-            value = param.model_class().objects.filter(pk=pk).first()
+            try:
+                value = param.model_class().objects.get(pk=pk)
+            except param.model_class().DoesNotExist:
+                value = None
 
         return value, param
 
