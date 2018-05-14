@@ -123,7 +123,7 @@ def _validate_event(event, params):
     }
 
     """
-    if not isinstance(event, basestring) or not event:
+    if not isinstance(event, str) or not event:
         return [Warning("invalid event name: '{event}'".format(event=event))]
 
     messages = []
@@ -170,7 +170,7 @@ def _validate_event_param(event, argument, param):
     name, type_ = param
     event_param = EventParam(argument, name, type_)
 
-    if not isinstance(name, basestring) or not name:
+    if not isinstance(name, str) or not name:
         messages.append(
             Error("invalid parameter name for event '{event}': '{name}'"
                   .format(name=name, event=event)))
