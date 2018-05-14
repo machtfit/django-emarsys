@@ -17,4 +17,5 @@ setup(name='django_emarsys',
       include_package_data=True,
       install_requires=[
           'jsonfield==2.0.2',
+          'future'
       ])

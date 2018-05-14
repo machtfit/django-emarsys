@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 jsonfield = "*"
 python-emarsys = {editable = true, git = "https://github.com/machtfit/python-emarsys.git"}
+future = "*"
 
 [dev-packages]
 mock = "*"
