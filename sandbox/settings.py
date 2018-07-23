@@ -90,7 +90,6 @@ STATIC_URL = '/static/'
 EMARSYS_ACCOUNT = 'company001'
 EMARSYS_PASSWORD = 'secret'
 EMARSYS_BASE_URI = 'https://suiteN.emarsys.net'
-EMARSYS_USE_NULL_GENERIC_CONTEXT_PROVIDER = True
 
 EMARSYS_EVENTS = {
     "to User, registration complete": {

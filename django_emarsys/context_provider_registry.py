@@ -7,8 +7,6 @@ from __future__ import unicode_literals
 
 import functools
 
-from django.conf import settings
-
 context_providers = {}
 
 
@@ -45,9 +43,3 @@ def get_context_provider(event_name):
                 "No context provider registered for event '{}' and"
                 " no general context provider registered either."
                 .format(event_name))
-
-
-if settings.EMARSYS_USE_NULL_GENERIC_CONTEXT_PROVIDER:
-    @register_context_provider(None)
-    def null_context_provider(event_name, **kwargs):
-        return {}
