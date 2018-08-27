@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
+import django.db.models.deletion
 from django.conf import settings
 
 
@@ -32,8 +33,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=1024)),
                 ('kwarg_name', models.CharField(max_length=1024)),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
-                ('event', models.ForeignKey(to='django_emarsys.Event')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=django.db.models.deletion.CASCADE), ),
+                ('event', models.ForeignKey(to='django_emarsys.Event', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
             },
@@ -50,8 +51,8 @@ class Migration(migrations.Migration):
                 ('result', models.CharField(max_length=1024, blank=True)),
                 ('result_code', models.CharField(max_length=1024, blank=True)),
                 ('state', models.CharField(default='sending', max_length=1024, choices=[('sending', 'sending'), ('error', 'error'), ('success', 'success')])),
-                ('event', models.ForeignKey(to='django_emarsys.Event')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True)),
+                ('event', models.ForeignKey(to='django_emarsys.Event', on_delete=django.db.models.deletion.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
             },
@@ -62,9 +63,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('object_id', models.PositiveIntegerField()),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
-                ('event_data', models.ForeignKey(to='django_emarsys.EventData')),
-                ('event_trigger', models.ForeignKey(to='django_emarsys.EventInstance')),
+                ('content_type', models.ForeignKey(to='contenttypes.ContentType', on_delete=django.db.models.deletion.CASCADE)),
+                ('event_data', models.ForeignKey(to='django_emarsys.EventData', on_delete=django.db.models.deletion.CASCADE)),
+                ('event_trigger', models.ForeignKey(to='django_emarsys.EventInstance', on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
             },
