@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from future.builtins import str
 
 import logging
 
@@ -63,7 +64,7 @@ class EventInstance(models.Model):
 
     def handle_error(self, msg):
         log.error("error for event id={}: {}".format(self.id, msg))
-        self.result = unicode(msg)
+        self.result = str(msg)
         self.state = EventInstance.STATE_ERROR
         self.save()
 

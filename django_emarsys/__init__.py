@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from future.builtins import str
 
 import django.apps
 
@@ -11,7 +12,7 @@ class EventParam(object):
     def __init__(self, argument, name, type_):
         self.argument = argument
         self.name = name
-        self.type_ = unicode(type_)
+        self.type_ = str(type_)
 
         self.is_list = self.type_[0] == '[' and self.type_[-1] == ']'
 
