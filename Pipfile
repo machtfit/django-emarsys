@@ -10,6 +10,7 @@ python-emarsys = {editable = true, git = "https://github.com/machtfit/python-ema
 [dev-packages]
 mock = "*"
 pytest-django = "*"
+tox = "*"
 
 [requires]
 python_version = "2.7"
