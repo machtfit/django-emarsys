@@ -119,11 +119,11 @@ class ConfigurationTestCase(TestCase):
                 Error("invalid parameter argument for event 'test event 1': ''"),  # noqa
                 Error("invalid parameter argument for event 'test event 1': 'invalid arg'"),  # noqa
                 Error("bad model 'invalid_app.User' for event 'test event 3': No installed app with label 'invalid_app'."),  # noqa
-                Error("bad model 'auth.InvalidModel' for event 'test event 3': App 'auth' doesn't have a 'invalidmodel' model."),  # noqa
+                Error("bad model 'auth.InvalidModel' for event 'test event 3': App 'auth' doesn't have a 'InvalidModel' model."),  # noqa
                 Error("bad model 'foo.bar.User' for event 'test event 3': too many values to unpack"),  # noqa
                 Error("bad model 'User' for event 'test event 3': need more than 1 value to unpack"),  # noqa
                 Error("invalid parameter definition 'test event 3': 'user5' => ()"),  # noqa
-                Error("bad model '1' for event 'test event 3': 'int' object has no attribute 'split'"),  # noqa
+                Error("bad model '1' for event 'test event 3': need more than 1 value to unpack"),  # noqa
                 Error("invalid parameter name for event 'test event 3': '1'"),
                 Error("invalid parameter definition 'test event 3': 'user8' => foo"),  # noqa
                 Error("invalid parameter argument for event 'töst üvänt,.!?;-#+* ß': 'üser'"),  # noqa

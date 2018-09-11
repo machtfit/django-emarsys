@@ -7,20 +7,20 @@ import django.apps
 default_app_config = 'django_emarsys.apps.DjangoEmarsysConfig'
 
 
-class EventParam:
+class EventParam(object):
     def __init__(self, argument, name, type_):
         self.argument = argument
         self.name = name
-        self.type_ = type_
+        self.type_ = unicode(type_)
 
-        self.is_list = type_[0] == '[' and type_[-1] == ']'
+        self.is_list = self.type_[0] == '[' and self.type_[-1] == ']'
 
-        self.is_string = type_ == 'string'
+        self.is_string = self.type_ == 'string'
 
         if self.is_list:
-            self.model = type_[1:-1]
+            self.model = self.type_[1:-1]
         else:
-            self.model = type_
+            self.model = self.type_
 
     def model_class(self):
         return django.apps.apps.get_model(self.model)
