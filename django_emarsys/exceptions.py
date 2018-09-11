@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
+from future.builtins import str
 
 
 class DjangoEmarsysError(Exception):
@@ -11,8 +12,8 @@ class BadDataError(DjangoEmarsysError):
     def __init__(self, expected_args, actual_args):
         super(BadDataError, self).__init__(
             "expected data args {}, got {}"
-            .format([unicode(x).encode() for x in expected_args],
-                    [unicode(x).encode() for x in actual_args]))
+            .format([str(x) for x in expected_args],
+                    [str(x) for x in actual_args]))
 
 
 class UnknownEventNameError(DjangoEmarsysError):

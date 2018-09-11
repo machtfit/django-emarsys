@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+jsonfield = "*"
+python-emarsys = {editable = true, git = "https://github.com/machtfit/python-emarsys.git"}
+future = "*"
+
+[dev-packages]
+mock = "*"
+pytest-django = "*"
+tox = "*"
+
+[requires]
+python_version = "2.7"

@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.checks import Critical, Error, Warning
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils import six
 
 from django_emarsys import config
 
@@ -112,25 +113,37 @@ class ConfigurationTestCase(TestCase):
 
         messages = config.validate_configuration(configuration)
 
-        self.assertSetEqual(
-            _make_message_set(messages),
-            _make_message_set([
+        expected_messages = [
                 Error("invalid parameter name for event 'test event 1': ''"),
                 Error("invalid parameter argument for event 'test event 1': ''"),  # noqa
                 Error("invalid parameter argument for event 'test event 1': 'invalid arg'"),  # noqa
                 Error("bad model 'invalid_app.User' for event 'test event 3': No installed app with label 'invalid_app'."),  # noqa
-                Error("bad model 'auth.InvalidModel' for event 'test event 3': App 'auth' doesn't have a 'invalidmodel' model."),  # noqa
-                Error("bad model 'foo.bar.User' for event 'test event 3': too many values to unpack"),  # noqa
-                Error("bad model 'User' for event 'test event 3': need more than 1 value to unpack"),  # noqa
+                Error("bad model 'auth.InvalidModel' for event 'test event 3': App 'auth' doesn't have a 'InvalidModel' model."),  # noqa
                 Error("invalid parameter definition 'test event 3': 'user5' => ()"),  # noqa
-                Error("bad model '1' for event 'test event 3': 'int' object has no attribute 'split'"),  # noqa
+
                 Error("invalid parameter name for event 'test event 3': '1'"),
                 Error("invalid parameter definition 'test event 3': 'user8' => foo"),  # noqa
                 Error("invalid parameter argument for event 'töst üvänt,.!?;-#+* ß': 'üser'"),  # noqa
 
                 Warning("invalid event name: ''"),
                 Warning("reused parameter name for event 'test event 1': 'Reused'"),  # noqa
-            ]))
+            ]
+
+        if six.PY2:
+            expected_messages += [
+                Error("bad model 'foo.bar.User' for event 'test event 3': too many values to unpack"),  # noqa
+                Error("bad model 'User' for event 'test event 3': need more than 1 value to unpack"),  # noqa
+                Error("bad model '1' for event 'test event 3': need more than 1 value to unpack"), # noqa
+            ]
+        else:
+            expected_messages += [
+                Error("bad model 'foo.bar.User' for event 'test event 3': too many values to unpack (expected 2)"),  # noqa
+                Error("bad model 'User' for event 'test event 3': not enough values to unpack (expected 2, got 1)"),  # noqa
+                Error("bad model '1' for event 'test event 3': not enough values to unpack (expected 2, got 1)"),  # noqa
+            ]
+
+        self.assertSetEqual(_make_message_set(messages),
+                            _make_message_set(expected_messages))
 
     @override_settings()
     @mock.patch('django_emarsys.config.validate_configuration')
