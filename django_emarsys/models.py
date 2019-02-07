@@ -63,13 +63,13 @@ class EventInstance(models.Model):
     emarsys_id = models.IntegerField(null=True, blank=True)
 
     def handle_error(self, msg):
-        log.error("error for event id={}: {}".format(self.id, msg))
+        log.warning("error for event id={}: {}".format(self.id, msg))
         self.result = str(msg)
         self.state = EventInstance.STATE_ERROR
         self.save()
 
     def handle_emarsys_error(self, emarsys_error):
-        log.error("emarsys error for event id={}: {}"
+        log.warning("emarsys error for event id={}: {}"
                   .format(self.id, emarsys_error))
         self.result = 'Emarsys error: {}'.format(emarsys_error)
         self.result_code = emarsys_error.code
