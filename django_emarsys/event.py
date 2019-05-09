@@ -19,8 +19,8 @@ log = logging.getLogger(__name__)
 
 
 def get_all_parameters_for_event(event_name):
-        return {argument: get_parameter_for_event(event_name, argument)
-                for argument in settings.EMARSYS_EVENTS[event_name].keys()}
+    return {argument: get_parameter_for_event(event_name, argument)
+            for argument in settings.EMARSYS_EVENTS[event_name].keys()}
 
 
 def get_parameter_for_event(event_name, argument):
@@ -49,6 +49,12 @@ def get_event_id(name):
         pass
 
     return None
+
+
+def create_event(name):
+    name, event_id = api.create_event(name)
+    event = Event.objects.create(emarsys_id=event_id, name=name)
+    return event
 
 
 def sync_events():

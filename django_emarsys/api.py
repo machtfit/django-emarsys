@@ -33,6 +33,11 @@ def get_events():
     return {event['name']: int(event['id']) for event in response}
 
 
+def create_event(name):
+    response = Client().call('/api/v2/event', 'POST', {'name': name})
+    return response['name'], response['id']
+
+
 def trigger_event(event_id, email, context):
     Client().call(
         '/api/v2/event/{}/trigger'.format(event_id), 'POST',
