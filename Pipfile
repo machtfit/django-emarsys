@@ -8,7 +8,6 @@ jsonfield = "*"
 python-emarsys = {editable = true, git = "https://github.com/machtfit/python-emarsys.git"}
 
 [dev-packages]
-mock = "*"
 pytest-django = "*"
 
 [requires]
