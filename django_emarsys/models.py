@@ -1,7 +1,6 @@
 import logging
 
-from jsonfield import JSONField
-
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,7 +44,7 @@ class EventInstance(models.Model):
     event_name = models.CharField(max_length=1024)
     recipient_email = models.CharField(max_length=1024)
     context = JSONField(null=True)
-    data = JSONField()
+    data = JSONField(default=None)
     when = models.DateTimeField(auto_now_add=True)
     source = models.CharField(max_length=1024, choices=SOURCE_CHOICES)
     result = models.CharField(max_length=1024, blank=True)

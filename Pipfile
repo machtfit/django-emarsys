@@ -5,10 +5,11 @@ name = "pypi"
 
 [packages]
 jsonfield = "*"
-python-emarsys = {editable = true, git = "https://github.com/machtfit/python-emarsys.git"}
+python-emarsys = {editable = true,git = "https://github.com/machtfit/python-emarsys.git"}
 
 [dev-packages]
 pytest-django = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.7"
