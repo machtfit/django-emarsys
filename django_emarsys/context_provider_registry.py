@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 A context provider transforms python data (``kwargs``) into emarsys event data.
 """
-
-from __future__ import unicode_literals
 
 import functools
 

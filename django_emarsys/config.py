@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-from future.builtins import str
-
 import re
 from collections import Counter
 from itertools import chain
