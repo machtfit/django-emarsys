@@ -1,4 +1,3 @@
-import json
 from collections import namedtuple
 
 from .models import EventInstance
