@@ -5,3 +5,4 @@ dist
 .idea
 .pytest_cache/
 .tox
+db.sqlite3
