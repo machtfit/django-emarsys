@@ -246,6 +246,8 @@ def _create_event_instance(event_name, recipient_email, emarsys_event_id,
     try:
         api.trigger_event(emarsys_event_id, recipient_email, context)
     except EmarsysError as e:
+        if e.code not in [2008, 5005]:
+            log.error(e, exc_info=True)
         event.handle_emarsys_error(e)
         return event
 
